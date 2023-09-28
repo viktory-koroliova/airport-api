@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     "airport",
     "user",
     "payments",
-
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -142,6 +142,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "airport.permissions.IsAdminOrIfAuthenticatedReadOnly",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
@@ -152,3 +153,16 @@ SIMPLE_JWT = {
 
 STRIPE_SECRET_KEY = os.environ["STRIPE_SECRET_KEY"]
 STRIPE_PUBLISHABLE_KEY = os.environ["STRIPE_PUBLISHABLE_KEY"]
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Airport API",
+    "DESCRIPTION": "API to manage purchase flight tickets and manage flights",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "SWAGGER_UI_SETTINGS": {
+        "deploying": True,
+        "defaultModelRenderer": "model",
+        "defaultModelExpandDepth": 2,
+        "defaultModelsExpandDepth": 2,
+    },
+}

@@ -1,6 +1,7 @@
 from typing import Type, Optional, Any
 
 from django.db.models import F, Count, QuerySet
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -93,6 +94,24 @@ class AircraftViewSet(
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "types",
+                type={"type": "list", "items": {"type": "number"}},
+                description="Filter by aircraft_type id. Ex: ?types=1,2",
+                required=False,
+            )
+        ]
+    )
+    def list(
+            self,
+            request: Request,
+            *args: tuple[Any],
+            **kwargs: dict[str, Any]
+    ) -> Response:
+        return super().list(request, *args, **kwargs)
 
 
 class AirlineViewSet(
@@ -198,6 +217,33 @@ class FlightViewSet(
 
         return queryset
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "routes",
+                type={"type": "list", "items": {"type": "number"}},
+                description="Filter by route id. Ex: ?routes=1,2",
+            ),
+            OpenApiParameter(
+                "crew",
+                type={"type": "list", "items": {"type": "number"}},
+                description="Filter by crew id. Ex: ?crew=1,2",
+            ),
+            OpenApiParameter(
+                "statuses",
+                type={"type": "list", "items": {"type": "string"}},
+                description="Filter by status. Ex: ?status=on_time,delayed",
+            ),
+        ]
+    )
+    def list(
+            self,
+            request: Request,
+            *args: tuple[Any],
+            **kwargs: dict[str, Any]
+    ) -> Response:
+        return super().list(request, *args, **kwargs)
+
 
 class RouteViewSet(
     mixins.ListModelMixin,
@@ -235,6 +281,30 @@ class RouteViewSet(
             )
 
         return queryset
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                "sources",
+                type={"type": "list", "items": {"type": "string"}},
+                description="Filter by departure airport IATA code. "
+                            "Ex: sources=jfk,kbp",
+            ),
+            OpenApiParameter(
+                "destinations",
+                type={"type": "list", "items": {"type": "string"}},
+                description="Filter by arrival airport IATA code. "
+                            "Ex: ?destinations=jfk,kbp",
+            ),
+        ],
+    )
+    def list(
+            self,
+            request: Request,
+            *args: tuple[Any],
+            **kwargs: dict[str, Any]
+    ) -> Response:
+        return super().list(request, *args, **kwargs)
 
 
 class OrderViewSet(
